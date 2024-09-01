@@ -204,7 +204,18 @@ app.put('/videos/:id', (req: RequestWithParamsAndBody<Param,UpdateVideoType>, re
         publicationDate
     }
     videos[Index] = newVideo
-    res.status(201).send(newVideo)
+    res.sendStatus(204)
+})
+
+app.delete('/videos/:id', (req: RequestWithParams<Param>, res: Response) => {
+    const id = +req.params.id
+    const index = videos.findIndex(v => v.id === id)
+    if(index < 0) {
+        res.sendStatus(404)
+        return
+    }
+    videos.splice(index, 1)
+    res.sendStatus(204)
 })
 
 app.delete('/testing/all-data', (req: Request, res: Response) => {

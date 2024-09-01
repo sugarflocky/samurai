@@ -194,7 +194,7 @@ app.put('/videos/:id', (req: RequestWithParamsAndBody<Param,UpdateVideoType>, re
             errors.errorMessages.push({message: 'Incorrect minAge restriction!', field: 'minAgeRestriction'})
         }
     }
-    const newVideo: VideoType = {
+    videos[Index] = {
         ...video,
         title,
         author,
@@ -203,7 +203,6 @@ app.put('/videos/:id', (req: RequestWithParamsAndBody<Param,UpdateVideoType>, re
         minAgeRestriction,
         publicationDate
     }
-    videos[Index] = newVideo
     res.sendStatus(204)
 })
 

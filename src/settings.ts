@@ -1,8 +1,4 @@
-import express, {Request, Response} from "express";
-
-export const app = express();
-
-app.use(express.json())
+/* import express, {Request, Response} from "express";
 
 const AvailableResolutions = ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"]
 
@@ -57,16 +53,6 @@ type VideoType = {
 
 }
 
-type RequestWithParams<P> = Request<P,unknown,unknown,unknown>
-
-type RequestWithBody<B> = Request<unknown,unknown,B,unknown>
-
-type RequestWithParamsAndBody<P,B> = Request<P,unknown,B,unknown>
-
-type Param = {
-    id:number
-}
-
 type CreateVideoType = {
     title: string
     author: string
@@ -82,16 +68,9 @@ type UpdateVideoType = {
     publicationDate?: string
 }
 
-type ErrorMessagesType = {
-    field: string
-    message: string
-}
 
-type ErrorType = {
-    errorMessages: ErrorMessagesType[]
-}
 
-app.get('/videos', (req: Request, res: Response) => {
+ app.get('/videos', (req: Request, res: Response) => {
     res.send(videos);
 })
 
@@ -217,8 +196,5 @@ app.delete('/videos/:id', (req: RequestWithParams<Param>, res: Response) => {
     res.sendStatus(204)
 })
 
-app.delete('/testing/all-data', (req: Request, res: Response) => {
-    videos.length = 0
-    res.sendStatus(204)
-})
 
+*/

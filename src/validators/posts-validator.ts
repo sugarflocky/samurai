@@ -6,8 +6,8 @@ import {inputModelValidation} from "../middlewares/validation";
 const blogIdValidation = body('blogId')
     .isString()
     .trim()
-    .custom((id:string) => {
-        const blog = BlogsRepository.getBlogById(id)
+    .custom(async (id:string) => {
+        const blog = await BlogsRepository.getBlogById(id)
         if (!blog) {
             throw new Error('Incorrect blogId')
         }

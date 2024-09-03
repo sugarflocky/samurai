@@ -9,31 +9,32 @@ import {PostsRepository} from "../repositories/posts-repository";
 
 export const postsRouter = Router({})
 
-postsRouter.get('/', (req: Request, res: Response) => {
-    res.send(PostsRepository.getAllPosts())
+postsRouter.get('/', async (req: Request, res: Response) => {
+    const posts = await PostsRepository.getAllPosts()
+    res.send(posts)
 })
-postsRouter.get('/:id', (req: RequestWithParams<Param>, res:Response) => {
-    const post = PostsRepository.getPostById(req.params.id)
+postsRouter.get('/:id', async (req: RequestWithParams<Param>, res:Response) => {
+    const post = await PostsRepository.getPostById(req.params.id)
     if (!post) {
         res.sendStatus(404)
         return
     }
     res.send(post)
 })
-postsRouter.post('/', authMiddleware, postsValidation(), (req: RequestWithBody<PostInputModel>, res: Response) => {
-    const post = PostsRepository.createPost(req.body)
+postsRouter.post('/', authMiddleware, postsValidation(), async (req: RequestWithBody<PostInputModel>, res: Response) => {
+    const post = await PostsRepository.createPost(req.body)
     res.status(201).send(post)
 })
-postsRouter.put('/:id', authMiddleware, postsValidation(), (req: RequestWithParamsAndBody<Param, PostInputModel>, res: Response) => {
-    const isUpdated = PostsRepository.updatePost(req.params.id, req.body)
+postsRouter.put('/:id', authMiddleware, postsValidation(), async (req: RequestWithParamsAndBody<Param, PostInputModel>, res: Response) => {
+    const isUpdated = await PostsRepository.updatePost(req.params.id, req.body)
     if (!isUpdated) {
         res.sendStatus(404)
         return
     }
     res.sendStatus(204)
 })
-postsRouter.delete('/:id', authMiddleware, (req: RequestWithParams<Param>, res: Response) => {
-    const isDeleted = PostsRepository.deletePost(req.params.id)
+postsRouter.delete('/:id', authMiddleware, async (req: RequestWithParams<Param>, res: Response) => {
+    const isDeleted = await PostsRepository.deletePost(req.params.id)
     if (!isDeleted) {
         res.sendStatus(404)
         return

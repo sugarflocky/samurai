@@ -1,44 +1,72 @@
-import {BlogsDB} from "../db/db";
-import {BlogInputModel, BlogViewModel} from "../types/blogs-types";
+import {blogsCollection} from "../db/db";
+import {BlogInputModel, blogMapper} from "../types/blogs-types";
+import {ObjectId} from "mongodb";
 
-export const BlogsRepository = {
-    getAllBlogs(){
-        return BlogsDB
-              },
-    getBlogById(id: string){
-        const blog = BlogsDB.find(b => b.id === id)
-        if (!blog) {
+export class BlogsRepository {
+    static async getAllBlogs(){
+        try {
+            const blogs = await blogsCollection.find({}).toArray();
+            return blogs.map(blogMapper)
+        } catch (e) {
             return false
         }
-        return blog
-    },
-    createBlog(blogInput: BlogInputModel){
-        const blog: BlogViewModel = {
-            id: new Date().toISOString(),
-            ...blogInput
-        }
-        BlogsDB.push(blog);
-        return blog
-    },
-    updateBlog(id: string, blogInput: BlogInputModel){
-        let blog = BlogsDB.find(b => b.id === id)
-        if (!blog) {
+    }
+
+    static async getBlogById(id: string){
+        try {
+            const blog = await blogsCollection.findOne({_id: new ObjectId(id)});
+            if (!blog) {
+                return false
+            }
+            return blogMapper(blog)
+        } catch (e) {
             return false
         }
-        const index = BlogsDB.findIndex(b => b.id === id)
-        blog = {
-            id: blog.id,
-            ...blogInput
-        }
-        BlogsDB[index] = blog
-        return true
-    },
-    deleteBlog(id: string){
-        const blogIndex = BlogsDB.findIndex(b => b.id === id)
-        if (blogIndex < 0){
+    }
+
+    static async createBlog(blogInput: BlogInputModel){
+        try {
+            const blog = {
+                ...blogInput,
+                createdAt: new Date().toISOString(),
+                isMembership: false
+            }
+            const result = await blogsCollection.insertOne(blog);
+            return this.getBlogById(result.insertedId.toString())
+        } catch (e) {
             return false
         }
-        BlogsDB.splice(blogIndex, 1)
-        return true
+    }
+
+    static async updateBlog(id: string, blogInput: BlogInputModel){
+        try {
+            let blog = await this.getBlogById(id.toString());
+            if (!blog) {
+                return false
+            }
+            await blogsCollection.updateOne({_id: new ObjectId(id)}, {
+                $set: {
+                    name: blogInput.name,
+                    description: blogInput.description,
+                    websiteUrl: blogInput.websiteUrl
+                }
+            })
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+
+    static async deleteBlog(id: string): Promise<boolean>{
+        try {
+            const blog = await this.getBlogById(id.toString());
+            if (!blog) {
+                return false
+            }
+            await blogsCollection.deleteOne({_id: new ObjectId(id)});
+            return true
+        } catch (e) {
+            return false
+        }
     }
 }

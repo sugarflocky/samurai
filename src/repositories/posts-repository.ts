@@ -1,4 +1,4 @@
-import {PostInputModel, postMapper} from "../types/posts-types";
+import {PostDbModel, PostInputModel, postMapper} from "../types/posts-types";
 import {BlogsRepository} from "./blogs-repository";
 import {postsCollection} from "../db/db";
 import {ObjectId} from "mongodb";
@@ -26,17 +26,8 @@ export class PostsRepository {
         }
     }
 
-    static async createPost(postInput: PostInputModel){
+    static async createPost(post: PostDbModel){
         try {
-            const blog = await BlogsRepository.getBlogById(postInput.blogId)
-            if (!blog) {
-                return false
-            }
-            const post = {
-                ...postInput,
-                blogName: blog.name,
-                createdAt: new Date().toISOString()
-            }
             const result = await postsCollection.insertOne(post);
             return this.getPostById(result.insertedId.toString())
         } catch (e) {

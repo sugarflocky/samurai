@@ -1,5 +1,5 @@
 import {blogsCollection} from "../db/db";
-import {BlogInputModel, blogMapper} from "../types/blogs-types";
+import {BlogDbModel, BlogInputModel, blogMapper} from "../types/blogs-types";
 import {ObjectId} from "mongodb";
 
 export class BlogsRepository {
@@ -24,13 +24,8 @@ export class BlogsRepository {
         }
     }
 
-    static async createBlog(blogInput: BlogInputModel){
+    static async createBlog(blog: BlogDbModel){
         try {
-            const blog = {
-                ...blogInput,
-                createdAt: new Date().toISOString(),
-                isMembership: false
-            }
             const result = await blogsCollection.insertOne(blog);
             return this.getBlogById(result.insertedId.toString())
         } catch (e) {

@@ -46,8 +46,8 @@ export class PostsQueryRepository {
 
     static async getPostsByBlogId(id: string, sortData: PostSortData){
         try {
-
-            if (!(await BlogsService.getBlogById(id))) {
+            const blog = await BlogsService.getBlogById(id)
+            if (!blog) {
                 return false
             }
 

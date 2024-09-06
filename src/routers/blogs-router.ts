@@ -67,8 +67,11 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<Param, Query
         pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
         pageSize: req.query.pageSize ? +req.query.pageSize : 10
     }
-
     const posts = await PostsService.getPostsByBlogId(req.params.id, sortData)
+    if (!posts) {
+        res.sendStatus(404)
+        return
+    }
     res.send(posts)
 })
 

@@ -2,6 +2,7 @@ import {postsCollection} from "../db/db";
 import {postMapper, PostSortData, PostViewModel} from "../types/posts-types";
 import {ObjectId} from "mongodb";
 import {Pagination} from "../types/types";
+import {BlogsService} from "../domain/blogs-service";
 
 
 
@@ -45,6 +46,11 @@ export class PostsQueryRepository {
 
     static async getPostsByBlogId(id: string, sortData: PostSortData){
         try {
+
+            if (!(await BlogsService.getBlogById(id))) {
+                return false
+            }
+
             const {sortDirection, sortBy, pageSize, pageNumber} = sortData;
             const posts = await postsCollection
                 .find({blogId: id})

@@ -17,23 +17,23 @@ export class BlogsRepository {
 
     static async updateBlog(id: string, blogInput: BlogInputModel){
         try {
-            await blogsCollection.updateOne({_id: new ObjectId(id)}, {
+            const result = await blogsCollection.updateOne({_id: new ObjectId(id)}, {
                 $set: {
                     name: blogInput.name,
                     description: blogInput.description,
                     websiteUrl: blogInput.websiteUrl
                 }
             })
-            return true
+            return !!result.matchedCount
         } catch (e) {
             return false
         }
     }
 
-    static async deleteBlog(id: string): Promise<boolean>{
+    static async deleteBlog(id: string){
         try {
-            await blogsCollection.deleteOne({_id: new ObjectId(id)});
-            return true
+            const result = await blogsCollection.deleteOne({_id: new ObjectId(id)});
+            return !!result.deletedCount
         } catch (e) {
             return false
         }

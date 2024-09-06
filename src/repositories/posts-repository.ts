@@ -21,7 +21,7 @@ export class PostsRepository {
             if (!blog){
                 return false
             }
-            await postsCollection.updateOne({_id: new ObjectId(id)}, {
+            const result = await postsCollection.updateOne({_id: new ObjectId(id)}, {
                 $set: {
                     title: postInput.title,
                     shortDescription: postInput.shortDescription,
@@ -30,7 +30,7 @@ export class PostsRepository {
                     blogName: blog.name
                 }
             })
-            return true
+            return !!result.matchedCount
         } catch (e) {
             return false
         }
@@ -38,8 +38,8 @@ export class PostsRepository {
 
     static async deletePost(id: string){
         try {
-            await postsCollection.deleteOne({_id: new ObjectId(id)})
-            return true
+            const result = await postsCollection.deleteOne({_id: new ObjectId(id)})
+            return !!result.deletedCount
         } catch (e) {
             return false
         }

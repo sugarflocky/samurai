@@ -1,7 +1,7 @@
 import {Router} from "express";
-import {Request, Response} from "express";
-import {RequestWithParams, Param, RequestWithParamsAndBody, RequestWithBody} from "../types/types";
-import {PostInputModel} from "../types/posts-types";
+import {Response} from "express";
+import {RequestWithParams, Param, RequestWithParamsAndBody, RequestWithBody, RequestWithQuery} from "../types/types";
+import {PostInputModel, QueryPostInputModel} from "../types/posts-types";
 import {authMiddleware} from "../middlewares/authorization";
 import {postsValidation} from "../validators/posts-validator";
 import {PostsService} from "../domain/posts-service";
@@ -9,8 +9,15 @@ import {PostsService} from "../domain/posts-service";
 
 export const postsRouter = Router({})
 
-postsRouter.get('/', async (req: Request, res: Response) => {
-    const posts = await PostsService.getAllPosts()
+postsRouter.get('/', async (req: RequestWithQuery<QueryPostInputModel>, res: Response) => {
+    const sortData = {
+        sortBy: req.query.sortBy ?? 'createdAt',
+        sortDirection: req.query.sortDirection ?? 'desc',
+        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+    }
+
+    const posts = await PostsService.getAllPosts(sortData)
     res.send(posts)
 })
 postsRouter.get('/:id', async (req: RequestWithParams<Param>, res:Response) => {

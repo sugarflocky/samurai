@@ -1,4 +1,4 @@
-import {WithId} from "mongodb";
+import {SortDirection, WithId} from "mongodb";
 
 export type PostViewModel = {
     id: string;
@@ -25,6 +25,27 @@ export type PostDbModel = {
     blogName: string;
     createdAt?: string;
 }
+
+export type QueryPostInputModel = {
+    sortBy?: string
+    sortDirection?: SortDirection
+    pageNumber?: number
+    pageSize?: number
+}
+
+export type PostInBlogInputModel = {
+    title: string;
+    shortDescription: string;
+    content: string;
+}
+
+export type PostSortData = {
+    sortBy: string
+    sortDirection: SortDirection
+    pageNumber: number
+    pageSize: number
+}
+
 
 export const postMapper = (post: WithId<PostDbModel>):PostViewModel => {
     return {

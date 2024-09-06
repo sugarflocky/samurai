@@ -1,16 +1,34 @@
 import {Router} from "express";
-import {Request, Response} from "express";
-import {RequestWithParams, Param, RequestWithParamsAndBody, RequestWithBody} from "../types/types";
-import {BlogInputModel} from "../types/blogs-types";
+import {Response} from "express";
+import {
+    RequestWithParams,
+    Param,
+    RequestWithParamsAndBody,
+    RequestWithBody,
+    RequestWithQuery,
+    RequestWithParamsAndQuery
+} from "../types/types";
+import {BlogInputModel, QueryBlogInputModel} from "../types/blogs-types";
 import {authMiddleware} from "../middlewares/authorization";
 import {blogsValidation} from "../validators/blogs-validator";
 import {BlogsService} from "../domain/blogs-service";
+import {postsFromBlogValidation} from "../validators/posts-validator";
+import {PostInBlogInputModel, QueryPostInputModel} from "../types/posts-types";
+import {PostsService} from "../domain/posts-service";
 
 
 export const blogsRouter = Router({})
 
-blogsRouter.get('/', async (req: Request, res: Response) => {
-    const blogs = await BlogsService.getAllBlogs()
+blogsRouter.get('/', async (req: RequestWithQuery<QueryBlogInputModel>, res: Response) => {
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm ?? null,
+        sortBy: req.query.sortBy ?? 'createdAt',
+        sortDirection: req.query.sortDirection ?? 'desc',
+        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+    }
+
+    const blogs = await BlogsService.getAllBlogs(sortData)
     res.send(blogs)
 })
 blogsRouter.get('/:id', async (req: RequestWithParams<Param>, res:Response) => {
@@ -40,4 +58,25 @@ blogsRouter.delete('/:id', authMiddleware, async (req: RequestWithParams<Param>,
         return
     }
     res.sendStatus(204)
+})
+
+blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<Param, QueryPostInputModel>, res: Response) => {
+    const sortData = {
+        sortBy: req.query.sortBy ?? 'createdAt',
+        sortDirection: req.query.sortDirection ?? 'desc',
+        pageNumber: req.query.pageNumber ? +req.query.pageNumber : 1,
+        pageSize: req.query.pageSize ? +req.query.pageSize : 10
+    }
+
+    const posts = await PostsService.getPostsByBlogId(req.params.id, sortData)
+    res.send(posts)
+})
+
+blogsRouter.post('/:id/posts', authMiddleware, postsFromBlogValidation(), async (req: RequestWithParamsAndBody<Param, PostInBlogInputModel>, res: Response) => {
+    const post = await PostsService.createPostInBlog(req.params.id, req.body)
+    if (!post) {
+        res.sendStatus(404)
+        return
+    }
+    res.status(201).send(post)
 })

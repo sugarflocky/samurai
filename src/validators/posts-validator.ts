@@ -1,13 +1,13 @@
-import {BlogsRepository} from "../repositories/blogs-repository";
 import {body} from "express-validator";
 import {inputModelValidation} from "../middlewares/validation";
+import {BlogsService} from "../domain/blogs-service";
 
 
 const blogIdValidation = body('blogId')
     .isString()
     .trim()
     .custom(async (id:string) => {
-        const blog = await BlogsRepository.getBlogById(id)
+        const blog = await BlogsService.getBlogById(id)
         if (!blog) {
             throw new Error('Incorrect blogId')
         }
@@ -33,3 +33,5 @@ const contentValidation = body('content')
     .withMessage('Incorrect content length')
 
 export const postsValidation = () => [blogIdValidation, titleValidation, shortDescriptionValidation, contentValidation, inputModelValidation]
+
+export const postsFromBlogValidation = () => [titleValidation, shortDescriptionValidation, contentValidation, inputModelValidation]

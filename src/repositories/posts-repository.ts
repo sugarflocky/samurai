@@ -1,35 +1,15 @@
-import {PostDbModel, PostInputModel, postMapper} from "../types/posts-types";
-import {BlogsRepository} from "./blogs-repository";
+import {PostDbModel, PostInputModel} from "../types/posts-types";
 import {postsCollection} from "../db/db";
 import {ObjectId} from "mongodb";
+import {BlogsService} from "../domain/blogs-service";
+import {PostsService} from "../domain/posts-service";
 
 
 export class PostsRepository {
-    static async getAllPosts(){
-        try {
-            const posts = await postsCollection.find({}).toArray();
-            return posts.map(postMapper)
-        } catch (e) {
-            return false
-        }
-    }
-
-    static async getPostById(id: string) {
-        try {
-            const post = await postsCollection.findOne({_id: new ObjectId(id)})
-            if (!post) {
-                return false
-            }
-            return postMapper(post);
-        } catch (e) {
-            return false
-        }
-    }
-
     static async createPost(post: PostDbModel){
         try {
             const result = await postsCollection.insertOne(post);
-            return this.getPostById(result.insertedId.toString())
+            return await PostsService.getPostById(result.insertedId.toString())
         } catch (e) {
             return false
         }
@@ -37,9 +17,8 @@ export class PostsRepository {
 
     static async updatePost(id: string, postInput: PostInputModel){
         try {
-            const blog = await BlogsRepository.getBlogById(postInput.blogId)
-            const post = this.getPostById(id)
-            if (!blog || !post) {
+            const blog = await BlogsService.getBlogById(postInput.blogId)
+            if (!blog){
                 return false
             }
             await postsCollection.updateOne({_id: new ObjectId(id)}, {
@@ -59,14 +38,24 @@ export class PostsRepository {
 
     static async deletePost(id: string){
         try {
-            const post = this.getPostById(id.toString());
-            if (!post) {
-                return false
-            }
             await postsCollection.deleteOne({_id: new ObjectId(id)})
             return true
         } catch (e) {
             return false
         }
     }
+
+    static async createPostInBlog(id: string, post: PostDbModel){
+        try {
+            const blog = await BlogsService.getBlogById(id)
+            if (!blog){
+                return false
+            }
+            const result = await postsCollection.insertOne(post);
+            return await PostsService.getPostById(result.insertedId.toString())
+        } catch (e) {
+            return false
+        }
+    }
+
 }

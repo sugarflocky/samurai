@@ -1,4 +1,4 @@
-import {WithId} from "mongodb";
+import {SortDirection, WithId} from "mongodb";
 
 export type BlogViewModel = {
     id: string
@@ -22,6 +22,23 @@ export type BlogDbModel = {
     createdAt?: string
     isMembership?: boolean
 }
+
+export type QueryBlogInputModel = {
+    searchNameTerm?: string
+    sortBy?: string
+    sortDirection?: SortDirection
+    pageNumber?: number
+    pageSize?: number
+}
+
+export type BlogSortData = {
+    searchNameTerm: string | null
+    sortBy: string
+    sortDirection: SortDirection
+    pageNumber: number
+    pageSize: number
+}
+
 
 export const blogMapper = (blog: WithId<BlogDbModel>): BlogViewModel => {
     return {
